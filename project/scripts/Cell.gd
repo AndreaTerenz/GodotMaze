@@ -15,7 +15,7 @@ var id : int = -1
 
 onready var default_font = Control.new().get_font("font")
 
-func setup(p : Vector2, i : int, t = CELL_TYPE.DISCONNECTED) -> void:
+func _init(p : Vector2, i : int, t = CELL_TYPE.DISCONNECTED) -> void:
 	self.position = p
 	self.top_left = self.position - SIZE/2
 	self.type = t
@@ -24,15 +24,20 @@ func setup(p : Vector2, i : int, t = CELL_TYPE.DISCONNECTED) -> void:
 func get_color_for_type() -> Color:
 	match (self.type):
 		CELL_TYPE.CONNECTED : return Color(255, 255, 255)
-		CELL_TYPE.DISCONNECTED : return Color(255, 255, 255)
+		CELL_TYPE.DISCONNECTED : return Color(0, 0, 0)
 		CELL_TYPE.START : return Color(0, 255, 0)
 		
 	return Color(0)
 	
-func connect_to_neighbor(n : int) -> void:
-	for neigh in NEIGHBORS:
-		self.connections[neigh] = (n == neigh)
-		self.type = CELL_TYPE.CONNECTED if (self.type == CELL_TYPE.CONNECTED or n == neigh) else CELL_TYPE.DISCONNECTED
+func connect_to_neighbor(n : int, propagate : bool = true) -> void:
+	var set_connected : bool = false
+	
+	for neigh in NEIGHBORS.values():
+		self.connections[neigh] = self.connections[neigh] or (n == neigh)
+		set_connected = set_connected or (n == neigh)
+		
+	if (set_connected and self.type != CELL_TYPE.START):
+		self.type = CELL_TYPE.CONNECTED
 
 func draw_borders() -> void:
 	var c : Color = Color(0, 0, 0)
@@ -64,3 +69,10 @@ func _draw() -> void:
 	draw_circle(self.position, 4, Color.white)
 	draw_circle(self.top_left, 4, Color.blue)
 	"""
+
+static func get_complementary_neighbor(n):
+	match (n):
+		NEIGHBORS.TOP: return NEIGHBORS.BOTTOM
+		NEIGHBORS.BOTTOM: return NEIGHBORS.TOP
+		NEIGHBORS.LEFT: return NEIGHBORS.RIGHT
+		NEIGHBORS.RIGHT: return NEIGHBORS.LEFT
