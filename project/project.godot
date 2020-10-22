@@ -13,9 +13,15 @@ _global_script_classes=[ {
 "class": "Cell",
 "language": "GDScript",
 "path": "res://scripts/Cell.gd"
+}, {
+"base": "Node2D",
+"class": "CellGrid",
+"language": "GDScript",
+"path": "res://scripts/CellGrid.gd"
 } ]
 _global_script_class_icons={
-"Cell": ""
+"Cell": "",
+"CellGrid": ""
 }
 
 [application]

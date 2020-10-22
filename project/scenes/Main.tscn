@@ -5,19 +5,15 @@ script/source = "extends Node2D
 
 var SCRN_SIZE : Vector2 = Vector2.ZERO
 
-export(PackedScene) var cell_scn = preload(\"res://scenes/Cell.tscn\")
-
 func _ready() -> void:
+	randomize()
 	SCRN_SIZE = get_viewport_rect().size
 	
 	var cols = int(SCRN_SIZE.x / Cell.SIZE.x)
 	var rows = int(SCRN_SIZE.y / Cell.SIZE.y)
 	
-	for x in range(0, cols):
-		for y in range(0, rows):
-			var c : Cell = cell_scn.instance()
-			c.setup((Vector2(x, y) * Cell.SIZE/2) + Cell.SIZE/4) #why +SIZE/4? NO IDEA off to a great start
-			call_deferred(\"add_child\", c)
+	var grid : CellGrid = CellGrid.new(rows, cols)
+	call_deferred(\"add_child\", grid)
 "
 
 [node name="Main" type="Node2D"]
