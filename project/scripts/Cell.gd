@@ -3,7 +3,7 @@ class_name Cell
 extends Node2D
 
 enum CELL_TYPE {START, CONNECTED, DISCONNECTED}
-enum NEIGHBORS {TOP, LEFT, BOTTOM, RIGHT}
+enum NEIGHBORS {TOP = 0, LEFT = 1, BOTTOM = 2, RIGHT = 3}
 
 const SIDE = 30
 const SIZE : Vector2 = Vector2(SIDE, SIDE)
@@ -24,27 +24,40 @@ func setup(p : Vector2, i : int, t = CELL_TYPE.DISCONNECTED) -> void:
 func get_color_for_type() -> Color:
 	match (self.type):
 		CELL_TYPE.CONNECTED : return Color(255, 255, 255)
-		CELL_TYPE.DISCONNECTED : return Color(0, 0, 0)
+		CELL_TYPE.DISCONNECTED : return Color(255, 255, 255)
 		CELL_TYPE.START : return Color(0, 255, 0)
 		
 	return Color(0)
 	
-func connect_to_neighbor(n : int):
-	match (n):
-		NEIGHBORS.TOP:pass
-		NEIGHBORS.BOTTOM:pass
-		NEIGHBORS.LEFT:pass
-		NEIGHBORS.RIGHT:pass
+func connect_to_neighbor(n : int) -> void:
+	for neigh in NEIGHBORS:
+		self.connections[neigh] = (n == neigh)
+		self.type = CELL_TYPE.CONNECTED if (self.type == CELL_TYPE.CONNECTED or n == neigh) else CELL_TYPE.DISCONNECTED
+
+func draw_borders() -> void:
+	var c : Color = Color(0, 0, 0)
+	
+	for n in NEIGHBORS.values():
+		if not(self.connections[n]):
+			var start : Vector2 = Vector2.ZERO
+			var end : Vector2 = Vector2.ONE
+			
+			match (n):
+				NEIGHBORS.TOP    : end.y = 0
+				NEIGHBORS.BOTTOM : start.y = 1
+				NEIGHBORS.LEFT   : end.x = 0
+				NEIGHBORS.RIGHT  : start.x = 1
+				
+			start = (start*SIDE) + self.top_left
+			end = (end*SIDE) + self.top_left
+
+			draw_line(start, end, c, 3.0)
 
 func _draw() -> void:
 	var r : Rect2 = Rect2(self.top_left, SIZE)
-	
-	if (self.type == CELL_TYPE.DISCONNECTED):
-		draw_rect(r, Color(255, 255, 255), false, 3.0)
-	else:
-		draw_rect(r, Color(0, 0, 0), false, 3.0)
-	
+
 	draw_rect(r, get_color_for_type())
+	draw_borders()
 	
 	"""
 	draw_string(self.default_font, self.position - Vector2(SIDE/3, 0), str(self.id))

@@ -35,3 +35,6 @@ func _ready() -> void:
 			var c : Cell = cell_scn.instance()
 			c.setup(pos, i, type) 
 			call_deferred("add_child", c)
+
+func boh():
+	pass

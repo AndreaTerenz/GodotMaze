@@ -9,8 +9,8 @@ func _ready() -> void:
 	randomize()
 	SCRN_SIZE = get_viewport_rect().size
 	
-	var cols = int(SCRN_SIZE.x / Cell.SIZE.x)
-	var rows = int(SCRN_SIZE.y / Cell.SIZE.y)
+	var cols = int(SCRN_SIZE.x / Cell.SIZE.x) 
+	var rows = int(SCRN_SIZE.y / Cell.SIZE.y) - 2
 	
 	var grid : CellGrid = CellGrid.new(rows, cols)
 	call_deferred(\"add_child\", grid)
