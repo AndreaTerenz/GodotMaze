@@ -2,7 +2,7 @@ class_name Cell
 
 extends Node2D
 
-enum CELL_TYPE {START, CONNECTED, DISCONNECTED}
+enum CELL_TYPE {CONNECTED, DISCONNECTED}
 enum NEIGHBORS {TOP = 0, LEFT = 1, BOTTOM = 2, RIGHT = 3}
 
 const SIDE = 30
@@ -25,7 +25,6 @@ func get_color_for_type() -> Color:
 	match (self.type):
 		CELL_TYPE.CONNECTED : return Color(255, 255, 255)
 		CELL_TYPE.DISCONNECTED : return Color(0, 0, 0)
-		CELL_TYPE.START : return Color(0, 255, 0)
 		
 	return Color(0)
 	
@@ -36,7 +35,7 @@ func connect_to_neighbor(n : int, propagate : bool = true) -> void:
 		self.connections[neigh] = self.connections[neigh] or (n == neigh)
 		set_connected = set_connected or (n == neigh)
 		
-	if (set_connected and self.type != CELL_TYPE.START):
+	if (set_connected):
 		self.type = CELL_TYPE.CONNECTED
 
 func draw_borders() -> void:

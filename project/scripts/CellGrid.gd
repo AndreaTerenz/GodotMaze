@@ -38,6 +38,8 @@ func _ready() -> void:
 func _input(event: InputEvent) -> void:
 	if Input.is_action_just_pressed("connect_next"):
 		boh()
+	elif Input.is_action_just_pressed("generate"):
+		pass
 
 func boh():
 	var r = randi() % self.rows
