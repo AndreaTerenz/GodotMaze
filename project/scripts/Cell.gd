@@ -8,18 +8,25 @@ enum NEIGHBORS {TOP = 0, LEFT = 1, BOTTOM = 2, RIGHT = 3}
 const SIDE = 30
 const SIZE : Vector2 = Vector2(SIDE, SIDE)
 
-var top_left : Vector2 = Vector2(-1, -1)
+var top_left : Vector2 = Vector2.ZERO
+var grid_pos : Vector2 = Vector2.ZERO
 var type = CELL_TYPE.DISCONNECTED
 var connections : Array = [false, false, false, false]
 var id : int = -1
 
 onready var default_font = Control.new().get_font("font")
 
-func _init(p : Vector2, i : int, t = CELL_TYPE.DISCONNECTED) -> void:
+func _init(p : Vector2, g_p : Vector2, i : int, t = CELL_TYPE.DISCONNECTED) -> void:
 	self.position = p
+	self.grid_pos = g_p
 	self.top_left = self.position - SIZE/2
 	self.type = t
 	self.id = i
+	
+func reset() -> void:
+	self.type = CELL_TYPE.DISCONNECTED
+	for n in NEIGHBORS.values():
+		self.connections[n] = false
 	
 func get_color_for_type() -> Color:
 	match (self.type):
@@ -27,7 +34,7 @@ func get_color_for_type() -> Color:
 		CELL_TYPE.DISCONNECTED : return Color(0, 0, 0)
 		
 	return Color(0)
-	
+
 func connect_to_neighbor(n : int, propagate : bool = true) -> void:
 	var set_connected : bool = false
 	
@@ -75,3 +82,11 @@ static func get_complementary_neighbor(n):
 		NEIGHBORS.BOTTOM: return NEIGHBORS.TOP
 		NEIGHBORS.LEFT: return NEIGHBORS.RIGHT
 		NEIGHBORS.RIGHT: return NEIGHBORS.LEFT
+
+static func get_neighbor_pos_delta(n) -> Vector2:
+	match(n):
+		NEIGHBORS.LEFT:   return Vector2(-1, 0)
+		NEIGHBORS.RIGHT:  return Vector2(1, 0)
+		NEIGHBORS.TOP:    return Vector2(0, -1)
+		NEIGHBORS.BOTTOM: return Vector2(0, 1)
+		_: return Vector2.ZERO
