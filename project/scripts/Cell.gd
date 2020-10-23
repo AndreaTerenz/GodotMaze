@@ -5,20 +5,20 @@ extends Node2D
 enum CELL_TYPE {CONNECTED, DISCONNECTED}
 enum NEIGHBORS {TOP = 0, LEFT = 1, BOTTOM = 2, RIGHT = 3}
 
-const SIDE = 30
+const SIDE = 15
 const SIZE : Vector2 = Vector2(SIDE, SIDE)
 
 var top_left : Vector2 = Vector2.ZERO
 var grid_pos : Vector2 = Vector2.ZERO
+var neighbors_ids : Array = [-1, -1, -1, -1]
 var type = CELL_TYPE.DISCONNECTED
 var connections : Array = [false, false, false, false]
 var id : int = -1
 
-onready var default_font = Control.new().get_font("font")
-
-func _init(p : Vector2, g_p : Vector2, i : int, t = CELL_TYPE.DISCONNECTED) -> void:
+func _init(p : Vector2, g_p : Vector2, i : int, n_i : Array, t = CELL_TYPE.DISCONNECTED) -> void:
 	self.position = p
 	self.grid_pos = g_p
+	self.neighbors_ids = n_i.duplicate(true)
 	self.top_left = self.position - SIZE/2
 	self.type = t
 	self.id = i
@@ -71,10 +71,15 @@ func _draw() -> void:
 	draw_borders()
 	
 	"""
-	draw_string(self.default_font, self.position - Vector2(SIDE/3, 0), str(self.id))
+	var default_font = Control.new().get_font("font")
+	draw_string(default_font, self.position - Vector2(SIDE/3, 0), str(self.id))
 	draw_circle(self.position, 4, Color.white)
 	draw_circle(self.top_left, 4, Color.blue)
 	"""
+	
+func get_neighbor_pos(n) -> Vector2:
+	var pos_delta : Vector2 = get_neighbor_pos_delta(n)
+	return self.grid_pos + pos_delta
 
 static func get_complementary_neighbor(n):
 	match (n):
