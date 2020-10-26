@@ -12,10 +12,10 @@ func _init(r:int, c:int, p:Vector2 = Vector2.ZERO) -> void:
 	self.cols = c
 	self.count=r*c
 	
-	for y in range(0, self.rows):
+	for _y in range(0, self.rows):
 		var row : Array = []
 		
-		for x in range(0, self.cols):
+		for _x in range(0, self.cols):
 			row.append(null)
 			
 		self.cells.append(row)
@@ -23,8 +23,6 @@ func _init(r:int, c:int, p:Vector2 = Vector2.ZERO) -> void:
 	self.position = p
 
 func _ready() -> void:
-	var start_idx = randi() % int(self.rows * self.cols)
-	
 	for r in range(0, self.rows):
 		for c in range(0, self.cols):
 			var i = get_id_for_cell_at(r, c)
@@ -39,12 +37,12 @@ func _ready() -> void:
 			call_deferred("add_child", cell)
 			self.cells[r][c] = cell
 
-func _input(event: InputEvent) -> void:
+func _input(_event: InputEvent) -> void:
 	if Input.is_action_just_pressed("generate"):
 		reset_cells()
 		
-		backtracer_iter()
-		#backtracer_rec()
+		#backtracer_iter()
+		backtracer_rec()
 	elif Input.is_action_just_pressed("connect_next"):
 		pass#boh()
 
@@ -62,7 +60,7 @@ func get_id_for_cell_at(r:int, c:int) -> int:
 func get_id_for_cell_neighbor(r:int, c:int, n) -> int:
 	if has_neighbor(Vector2(r, c), n):
 		var pos_delta : Vector2 = Cell.get_neighbor_pos_delta(n)
-		return get_id_for_cell_at(r - pos_delta.y, c - pos_delta.x)
+		return get_id_for_cell_at(r - int(pos_delta.y), c - int(pos_delta.x))
 	
 	return -1
 
@@ -81,10 +79,6 @@ func has_neighbor(pos : Vector2, n) -> bool:
 	   (n == Cell.NEIGHBORS.BOTTOM and r == self.rows-1) or \
 	   (n == Cell.NEIGHBORS.LEFT and c == 0) or \
 	   (n == Cell.NEIGHBORS.RIGHT and c == self.cols-1))
-
-func connect_cells(cell1 : Cell, cell2 : Cell, n) -> void:
-	cell1.connect_to_neighbor(n)
-	cell2.connect_to_neighbor(Cell.get_complementary_neighbor(n))
 	
 func backtracer_iter() -> void:
 	var r = randi() % self.rows
@@ -102,8 +96,8 @@ func backtracer_iter() -> void:
 				var neighbor : Cell = get_neighbor_for_cell(current, n)
 				
 				if neighbor.type == Cell.CELL_TYPE.DISCONNECTED:
+					current.connect_to_neighbor(neighbor)
 					stack.push_front(current)
-					connect_cells(current, neighbor, n)
 					stack.push_front(neighbor)
 					
 		neighbors.shuffle()
@@ -112,7 +106,7 @@ func backtracer_iter() -> void:
 func backtracer_rec() -> void:
 	var r = randi() % self.rows
 	var c = randi() % self.cols
-	
+
 	bktrcr_rec_main(self.cells[r][c])
 	
 func bktrcr_rec_main(current : Cell) -> void:
@@ -123,6 +117,6 @@ func bktrcr_rec_main(current : Cell) -> void:
 			var neighbor : Cell = get_neighbor_for_cell(current, n)
 			
 			if neighbor.type == Cell.CELL_TYPE.DISCONNECTED:
-				connect_cells(current, neighbor, n)
+				current.connect_to_neighbor(neighbor)
 				bktrcr_rec_main(neighbor)
 

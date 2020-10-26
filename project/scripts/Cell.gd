@@ -12,7 +12,7 @@ var top_left : Vector2 = Vector2.ZERO
 var grid_pos : Vector2 = Vector2.ZERO
 var neighbors_ids : Array = [-1, -1, -1, -1]
 var type = CELL_TYPE.DISCONNECTED
-var connections : Array = [false, false, false, false]
+var connections : Array = [null, null, null, null]
 var id : int = -1
 
 func _init(p : Vector2, g_p : Vector2, i : int, n_i : Array, t = CELL_TYPE.DISCONNECTED) -> void:
@@ -26,7 +26,8 @@ func _init(p : Vector2, g_p : Vector2, i : int, n_i : Array, t = CELL_TYPE.DISCO
 func reset() -> void:
 	self.type = CELL_TYPE.DISCONNECTED
 	for n in NEIGHBORS.values():
-		self.connections[n] = false
+		self.connections[n] = null
+	update()
 	
 func get_color_for_type() -> Color:
 	match (self.type):
@@ -35,22 +36,21 @@ func get_color_for_type() -> Color:
 		
 	return Color(0)
 
-func connect_to_neighbor(n : int, propagate : bool = true) -> void:
-	var set_connected : bool = false
+func connect_to_neighbor(neighbor, propagate : bool = true) -> void:
+	var n = pos_delta_to_neighbor(neighbor.grid_pos - self.grid_pos)
+	self.connections[n] = neighbor
 	
-	for neigh in NEIGHBORS.values():
-		self.connections[neigh] = self.connections[neigh] or (n == neigh)
-		set_connected = set_connected or (n == neigh)
-		
-	if (set_connected):
-		self.type = CELL_TYPE.CONNECTED
-		update()
+	self.type = CELL_TYPE.CONNECTED
+	update()
+
+	if (propagate):
+		neighbor.connect_to_neighbor(self, false)
 
 func draw_borders() -> void:
 	var c : Color = Color(0, 0, 0)
 	
 	for n in NEIGHBORS.values():
-		if not(self.connections[n]):
+		if (self.connections[n] == null):
 			var start : Vector2 = Vector2.ZERO
 			var end : Vector2 = Vector2.ONE
 			
@@ -94,6 +94,14 @@ static func get_complementary_neighbor(n) -> int:
 		NEIGHBORS.LEFT: return NEIGHBORS.RIGHT
 		NEIGHBORS.RIGHT: return NEIGHBORS.LEFT
 		_ : return -1
+
+static func pos_delta_to_neighbor(delta : Vector2) -> int:
+	match(delta):
+		Vector2(-1, 0): return NEIGHBORS.LEFT
+		Vector2(1, 0): return NEIGHBORS.RIGHT
+		Vector2(0, -1): return NEIGHBORS.TOP
+		Vector2(0, 1): return NEIGHBORS.BOTTOM
+		_: return -1
 
 static func get_neighbor_pos_delta(n) -> Vector2:
 	match(n):
