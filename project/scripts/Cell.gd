@@ -44,6 +44,7 @@ func connect_to_neighbor(n : int, propagate : bool = true) -> void:
 		
 	if (set_connected):
 		self.type = CELL_TYPE.CONNECTED
+		update()
 
 func draw_borders() -> void:
 	var c : Color = Color(0, 0, 0)
@@ -80,13 +81,19 @@ func _draw() -> void:
 func get_neighbor_pos(n) -> Vector2:
 	var pos_delta : Vector2 = get_neighbor_pos_delta(n)
 	return self.grid_pos + pos_delta
+	
+static func get_shuffled_neighbors() -> Array:
+	var output : Array = NEIGHBORS.values().duplicate(true)
+	output.shuffle()
+	return output
 
-static func get_complementary_neighbor(n):
+static func get_complementary_neighbor(n) -> int:
 	match (n):
 		NEIGHBORS.TOP: return NEIGHBORS.BOTTOM
 		NEIGHBORS.BOTTOM: return NEIGHBORS.TOP
 		NEIGHBORS.LEFT: return NEIGHBORS.RIGHT
 		NEIGHBORS.RIGHT: return NEIGHBORS.LEFT
+		_ : return -1
 
 static func get_neighbor_pos_delta(n) -> Vector2:
 	match(n):

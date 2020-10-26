@@ -43,7 +43,8 @@ func _input(event: InputEvent) -> void:
 	if Input.is_action_just_pressed("generate"):
 		reset_cells()
 		
-		backtracer_rec()
+		backtracer_iter()
+		#backtracer_rec()
 	elif Input.is_action_just_pressed("connect_next"):
 		pass#boh()
 
@@ -85,8 +86,28 @@ func connect_cells(cell1 : Cell, cell2 : Cell, n) -> void:
 	cell1.connect_to_neighbor(n)
 	cell2.connect_to_neighbor(Cell.get_complementary_neighbor(n))
 	
-	cell1.update()
-	cell2.update()
+func backtracer_iter() -> void:
+	var r = randi() % self.rows
+	var c = randi() % self.cols
+	var start : Cell = self.cells[r][c]
+	start.type = Cell.CELL_TYPE.CONNECTED
+	var stack : Array = [start]
+	var neighbors : Array = Cell.get_shuffled_neighbors()
+	
+	while not(stack.empty()):
+		var current : Cell = stack.pop_front()
+		
+		for n in neighbors:
+			if has_neighbor(current.grid_pos, n):
+				var neighbor : Cell = get_neighbor_for_cell(current, n)
+				
+				if neighbor.type == Cell.CELL_TYPE.DISCONNECTED:
+					stack.push_front(current)
+					connect_cells(current, neighbor, n)
+					stack.push_front(neighbor)
+					
+		neighbors.shuffle()
+	
 
 func backtracer_rec() -> void:
 	var r = randi() % self.rows
@@ -95,8 +116,7 @@ func backtracer_rec() -> void:
 	bktrcr_rec_main(self.cells[r][c])
 	
 func bktrcr_rec_main(current : Cell) -> void:
-	var neighbors = Cell.NEIGHBORS.values().duplicate(true)
-	neighbors.shuffle()
+	var neighbors = Cell.get_shuffled_neighbors()
 	
 	for n in neighbors:
 		if has_neighbor(current.grid_pos, n):
