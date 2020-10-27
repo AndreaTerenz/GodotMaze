@@ -43,7 +43,8 @@ func _input(_event: InputEvent) -> void:
 		reset_cells()
 		var start = OS.get_system_time_msecs()
 		
-		kruskal()
+		prim()
+		#kruskal()
 		#backtracer_iter()
 		
 		#backtracer_rec()
@@ -132,6 +133,33 @@ func get_random_cell() -> Cell:
 	var r = randi() % self.rows
 	var c = randi() % self.cols
 	return get_cell_at(Vector2(c, r))
+	
+func prim() -> void:
+	var start : Cell = get_random_cell()
+	start.type = Cell.CELL_TYPE.CONNECTED
+	
+	var frontier : Array = []
+	for n in Cell.NEIGHBORS.values():
+		if has_neighbor(start.grid_pos, n):
+			frontier.append(get_neighbor_for_cell(start, n))
+	
+	while not(frontier.empty()):
+		var p : int = randi() % frontier.size()
+		var next : Cell = frontier[p]
+		frontier.remove(p)
+		
+		var ns : Array = []
+		var n_vals = Cell.NEIGHBORS.values().duplicate()
+		n_vals.shuffle()
+		
+		for n in n_vals:
+			if has_neighbor(next.grid_pos, n):
+				var neigh : Cell = get_neighbor_for_cell(next, n)
+				if neigh.type == Cell.CELL_TYPE.CONNECTED and next.type != Cell.CELL_TYPE.CONNECTED:
+					next.connect_to_neighbor(neigh)
+				elif neigh.type == Cell.CELL_TYPE.DISCONNECTED:
+					frontier.append(neigh)
+	
 
 func kruskal() -> void:
 	var edges : Array = get_shuffled_edge_list()
