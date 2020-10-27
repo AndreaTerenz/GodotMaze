@@ -41,9 +41,17 @@ func _ready() -> void:
 func _input(_event: InputEvent) -> void:
 	if Input.is_action_just_pressed("generate"):
 		reset_cells()
+		var start = OS.get_system_time_msecs()
+		
 		kruskal()
 		#backtracer_iter()
+		
 		#backtracer_rec()
+		
+		var end = OS.get_system_time_msecs()
+		
+		print(abs(start - end))
+		
 	elif Input.is_action_just_pressed("connect_next"):
 		pass#boh()
 
@@ -52,17 +60,16 @@ func get_shuffled_edge_list() -> Array:
 	
 	for i in range(0, self.count-1):
 		var p : Vector2 = cell_id_to_pos(i)
-		
+
 		if (p.x < self.cols-1):
 			var h_edge : Array = [i, i+1]
-			if output.size() == 0:
-				output.append(h_edge)
-			else:
-				output.insert(randi()%output.size(), h_edge)
-		
+			output.append(h_edge)
+
 		if (p.y < self.rows-1):
 			var v_edge : Array = [i, i+self.cols]
-			output.insert(randi()%output.size(), v_edge)
+			output.append(v_edge)
+	
+	output.shuffle()
 
 	return output
 
@@ -130,11 +137,10 @@ func get_random_cell() -> Cell:
 func kruskal() -> void:
 	var edges : Array = get_shuffled_edge_list()
 	
-	while not(edges.empty()):
-		var e : Array = edges.pop_front()
+	for e in edges:
 		var cell1 : Cell = get_cell_by_id(e[0])
 		var cell2 : Cell = get_cell_by_id(e[1])
-
+	 
 		if (cell1.kruskal_merge_with(cell2)):
 			cell1.connect_to_neighbor(cell2)
 

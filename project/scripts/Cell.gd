@@ -5,7 +5,7 @@ extends Node2D
 enum CELL_TYPE {CONNECTED, DISCONNECTED}
 enum NEIGHBORS {TOP = 0, LEFT = 1, BOTTOM = 2, RIGHT = 3}
 
-const SIDE = 15
+const SIDE = 60
 const SIZE : Vector2 = Vector2(SIDE, SIDE)
 
 var top_left : Vector2 = Vector2.ZERO
@@ -16,6 +16,7 @@ var connections : Array = [null, null, null, null]
 var id : int = -1
 
 var kruskal_parent = self
+var kruskal_root = self
 
 func _init(p : Vector2, g_p : Vector2, i : int, n_i : Array, t = CELL_TYPE.DISCONNECTED) -> void:
 	self.position = p
@@ -92,12 +93,10 @@ func kruskal_same_set_as(other) -> bool:
 	return other.kruskal_find() == kruskal_find()
 
 func kruskal_find() -> Cell:
-	var parent = self.kruskal_parent
-	
-	while parent != parent.kruskal_parent:
-		parent = parent.kruskal_parent
-	
-	return parent
+	if self != self.kruskal_parent:
+		return self.kruskal_parent.kruskal_find()
+	else:
+		return self
 
 func kruskal_merge_with(other) -> bool:
 	var root = self.kruskal_find()
