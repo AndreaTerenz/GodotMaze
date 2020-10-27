@@ -15,6 +15,8 @@ var type = CELL_TYPE.DISCONNECTED
 var connections : Array = [null, null, null, null]
 var id : int = -1
 
+var kruskal_parent = self
+
 func _init(p : Vector2, g_p : Vector2, i : int, n_i : Array, t = CELL_TYPE.DISCONNECTED) -> void:
 	self.position = p
 	self.grid_pos = g_p
@@ -25,6 +27,7 @@ func _init(p : Vector2, g_p : Vector2, i : int, n_i : Array, t = CELL_TYPE.DISCO
 	
 func reset() -> void:
 	self.type = CELL_TYPE.DISCONNECTED
+	self.kruskal_parent = self
 	for n in NEIGHBORS.values():
 		self.connections[n] = null
 	update()
@@ -81,7 +84,33 @@ func _draw() -> void:
 func get_neighbor_pos(n) -> Vector2:
 	var pos_delta : Vector2 = get_neighbor_pos_delta(n)
 	return self.grid_pos + pos_delta
+
+func get_random_neighbor() -> Vector2:
+	return get_neighbor_pos(NEIGHBORS.values()[randi() % NEIGHBORS.values().size()])
 	
+func kruskal_same_set_as(other) -> bool:
+	return other.kruskal_find() == kruskal_find()
+
+func kruskal_find() -> Cell:
+	var parent = self.kruskal_parent
+	
+	while parent != parent.kruskal_parent:
+		parent = parent.kruskal_parent
+	
+	return parent
+
+func kruskal_merge_with(other) -> bool:
+	var root = self.kruskal_find()
+	var other_root = other.kruskal_find()
+
+	if (root != other_root):
+		if (root.id < other_root.id):
+			other_root.kruskal_parent = root
+		else:
+			root.kruskal_parent = other_root
+			
+	return (root != other_root)
+
 static func get_shuffled_neighbors() -> Array:
 	var output : Array = NEIGHBORS.values().duplicate(true)
 	output.shuffle()

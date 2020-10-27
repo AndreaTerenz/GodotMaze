@@ -3,9 +3,9 @@ class_name CellGrid
 extends Node2D
 
 var cells : Array = []
-var count = 0
-var cols = -1
-var rows = -1
+var count : int = 0
+var cols : int = -1
+var rows : int = -1
 
 func _init(r:int, c:int, p:Vector2 = Vector2.ZERO) -> void:
 	self.rows = r
@@ -25,49 +25,80 @@ func _init(r:int, c:int, p:Vector2 = Vector2.ZERO) -> void:
 func _ready() -> void:
 	for r in range(0, self.rows):
 		for c in range(0, self.cols):
-			var i = get_id_for_cell_at(r, c)
+			var p : Vector2 = Vector2(c, r)
+			var i = get_id_for_cell_at(p)
 			var pos = (Vector2(c, r) * Cell.SIZE/2) + Cell.SIZE/4 #why +SIZE/4? NO IDEA off to a great start
 			var type = Cell.CELL_TYPE.DISCONNECTED# if (i != start_idx) else Cell.CELL_TYPE.START
 			
 			var n_i : Array = []
 			for n in Cell.NEIGHBORS.values():
-				n_i.append(get_id_for_cell_neighbor(r, c, n))
+				n_i.append(get_id_for_cell_neighbor(p, n))
 			
-			var cell : Cell = Cell.new(pos, Vector2(c, r), i, n_i, type) 
+			var cell : Cell = Cell.new(pos, p, i, n_i, type) 
 			call_deferred("add_child", cell)
 			self.cells[r][c] = cell
 
 func _input(_event: InputEvent) -> void:
 	if Input.is_action_just_pressed("generate"):
 		reset_cells()
-		
+		kruskal()
 		#backtracer_iter()
-		backtracer_rec()
+		#backtracer_rec()
 	elif Input.is_action_just_pressed("connect_next"):
 		pass#boh()
+
+func get_shuffled_edge_list() -> Array:
+	var output : Array = []
+	
+	for i in range(0, self.count-1):
+		var p : Vector2 = cell_id_to_pos(i)
+		
+		if (p.x < self.cols-1):
+			var h_edge : Array = [i, i+1]
+			if output.size() == 0:
+				output.append(h_edge)
+			else:
+				output.insert(randi()%output.size(), h_edge)
+		
+		if (p.y < self.rows-1):
+			var v_edge : Array = [i, i+self.cols]
+			output.insert(randi()%output.size(), v_edge)
+
+	return output
 
 func reset_cells() -> void:
 	for row in self.cells:
 		for cell in row:
 			cell.reset()
 
-func get_cell_at(r:int, c:int) -> Cell:
-	return self.cells[r][c]
+func get_cell_at(p : Vector2) -> Cell:
+	return self.cells[int(p.y)][int(p.x)]
 
-func get_id_for_cell_at(r:int, c:int) -> int:
-	return r*self.cols + c
+func get_cell_by_id(i : int) -> Cell:
+	return get_cell_at(cell_id_to_pos(i))
+
+func get_id_for_cell_at(p : Vector2) -> int:
+	return int(p.y)*self.cols + int(p.x)
+
+func cell_id_to_pos(i : int) -> Vector2:
+	var output : Vector2 = Vector2.ZERO
 	
-func get_id_for_cell_neighbor(r:int, c:int, n) -> int:
-	if has_neighbor(Vector2(r, c), n):
+	output.y = i / self.cols #row
+	output.x = i % self.cols #column
+	
+	return output
+
+func get_id_for_cell_neighbor(p : Vector2, n) -> int:
+	if has_neighbor(p, n):
 		var pos_delta : Vector2 = Cell.get_neighbor_pos_delta(n)
-		return get_id_for_cell_at(r - int(pos_delta.y), c - int(pos_delta.x))
+		return get_id_for_cell_at(p - pos_delta)
 	
 	return -1
 
 func get_neighbor_for_cell(cell : Cell, n) -> Cell:
 	if has_neighbor(cell.grid_pos, n):
 		var pos : Vector2 = cell.get_neighbor_pos(n)
-		return self.cells[pos.y][pos.x]
+		return get_cell_at(pos)
 	
 	return null
 
@@ -79,12 +110,38 @@ func has_neighbor(pos : Vector2, n) -> bool:
 	   (n == Cell.NEIGHBORS.BOTTOM and r == self.rows-1) or \
 	   (n == Cell.NEIGHBORS.LEFT and c == 0) or \
 	   (n == Cell.NEIGHBORS.RIGHT and c == self.cols-1))
+
+func get_radom_neighbor_for_cell(cell : Cell) -> int:
+	var pos : Vector2 = cell.grid_pos
+	var ns : Array = Cell.NEIGHBORS.values().duplicate(true)
+	ns.shuffle()
 	
-func backtracer_iter() -> void:
+	for n in ns:
+		if has_neighbor(cell.grid_pos, n):
+			return n
+	
+	return -1
+	
+func get_random_cell() -> Cell:
 	var r = randi() % self.rows
 	var c = randi() % self.cols
-	var start : Cell = self.cells[r][c]
+	return get_cell_at(Vector2(c, r))
+
+func kruskal() -> void:
+	var edges : Array = get_shuffled_edge_list()
+	
+	while not(edges.empty()):
+		var e : Array = edges.pop_front()
+		var cell1 : Cell = get_cell_by_id(e[0])
+		var cell2 : Cell = get_cell_by_id(e[1])
+
+		if (cell1.kruskal_merge_with(cell2)):
+			cell1.connect_to_neighbor(cell2)
+
+func backtracer_iter() -> void:
+	var start : Cell = get_random_cell()
 	start.type = Cell.CELL_TYPE.CONNECTED
+	
 	var stack : Array = [start]
 	var neighbors : Array = Cell.get_shuffled_neighbors()
 	
@@ -101,13 +158,9 @@ func backtracer_iter() -> void:
 					stack.push_front(neighbor)
 					
 		neighbors.shuffle()
-	
 
 func backtracer_rec() -> void:
-	var r = randi() % self.rows
-	var c = randi() % self.cols
-
-	bktrcr_rec_main(self.cells[r][c])
+	bktrcr_rec_main(get_random_cell())
 	
 func bktrcr_rec_main(current : Cell) -> void:
 	var neighbors = Cell.get_shuffled_neighbors()
