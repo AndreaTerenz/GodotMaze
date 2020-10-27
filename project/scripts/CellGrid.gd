@@ -28,7 +28,7 @@ func _ready() -> void:
 			var p : Vector2 = Vector2(c, r)
 			var i = get_id_for_cell_at(p)
 			var pos = (Vector2(c, r) * Cell.SIZE/2) + Cell.SIZE/4 #why +SIZE/4? NO IDEA off to a great start
-			var type = Cell.CELL_TYPE.DISCONNECTED# if (i != start_idx) else Cell.CELL_TYPE.START
+			var type = Cell.CELL_TYPE.DISCONNECTED
 			
 			var n_i : Array = []
 			for n in Cell.NEIGHBORS.values():
@@ -119,7 +119,6 @@ func has_neighbor(pos : Vector2, n) -> bool:
 	   (n == Cell.NEIGHBORS.RIGHT and c == self.cols-1))
 
 func get_radom_neighbor_for_cell(cell : Cell) -> int:
-	var pos : Vector2 = cell.grid_pos
 	var ns : Array = Cell.NEIGHBORS.values().duplicate(true)
 	ns.shuffle()
 	
