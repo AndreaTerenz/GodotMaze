@@ -5,12 +5,13 @@ extends Node2D
 enum CELL_TYPE {CONNECTED, DISCONNECTED}
 enum NEIGHBORS {TOP = 0, LEFT = 1, BOTTOM = 2, RIGHT = 3}
 
-const SIDE = 7
+const SIDE = 30
 const SIZE : Vector2 = Vector2(SIDE, SIDE)
 
 var top_left : Vector2 = Vector2.ZERO
 var grid_pos : Vector2 = Vector2.ZERO
 var neighbors_ids : Array = [-1, -1, -1, -1]
+var available_neighbors : Array = []
 var type = CELL_TYPE.DISCONNECTED
 var connections : Array = [null, null, null, null]
 var id : int = -1
@@ -22,6 +23,12 @@ func _init(p : Vector2, g_p : Vector2, i : int, n_i : Array, t = CELL_TYPE.DISCO
 	self.position = p
 	self.grid_pos = g_p
 	self.neighbors_ids = n_i.duplicate(true)
+	
+	for n in NEIGHBORS.values():
+		if self.neighbors_ids[n] != -1:
+			self.available_neighbors.append(n)
+	self.available_neighbors.shuffle()
+	
 	self.top_left = self.position - SIZE/2
 	self.type = t
 	self.id = i
@@ -31,8 +38,15 @@ func reset() -> void:
 	self.kruskal_parent = self
 	for n in NEIGHBORS.values():
 		self.connections[n] = null
+	self.available_neighbors.shuffle()
 	update()
-	
+
+func has_neighbor(n) -> bool:
+	return (self.neighbors_ids[n] != -1)
+
+func get_neighbor_id(n) -> int:
+	return self.neighbors_ids[n]
+
 func get_color_for_type() -> Color:
 	match (self.type):
 		CELL_TYPE.CONNECTED : return Color(255, 255, 255)
