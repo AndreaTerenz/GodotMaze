@@ -5,7 +5,8 @@ extends Node2D
 enum CELL_TYPE {CONNECTED, DISCONNECTED}
 enum NEIGHBORS {TOP = 0, LEFT = 1, BOTTOM = 2, RIGHT = 3}
 
-const SIDE = 30
+#don't let this number drop under 15 or the recursive backtracer will have a stack overflow
+const SIDE = 15
 const SIZE : Vector2 = Vector2(SIDE, SIDE)
 
 var top_left : Vector2 = Vector2.ZERO

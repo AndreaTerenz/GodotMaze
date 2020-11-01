@@ -10,13 +10,16 @@ func _ready() -> void:
 	SCRN_SIZE = get_viewport_rect().size
 	
 	var cols = int(SCRN_SIZE.x / Cell.SIZE.x) 
-	var rows = int(SCRN_SIZE.y / Cell.SIZE.y) - 2
+	var rows = int(SCRN_SIZE.y / Cell.SIZE.y)
+	var offset : Vector2 = Vector2.ZERO#(SCRN_SIZE - Cell.SIZE*Vector2(cols, rows))/2
 	
-	var grid : CellGrid = CellGrid.new(rows, cols)
+	var grid : CellGrid = CellGrid.new(rows, cols, offset)
 	call_deferred(\"add_child\", grid)
 
 func _input(_event: InputEvent) -> void:
 	if Input.is_action_just_pressed(\"ui_cancel\"):
+		print(\"quitting...\\n\\n\")
+		
 		get_tree().quit()
 "
 

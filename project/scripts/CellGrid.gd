@@ -44,11 +44,13 @@ func _input(_event: InputEvent) -> void:
 	if Input.is_action_just_pressed("generate"):
 		reset_cells()
 		var start = OS.get_system_time_msecs()
-		
-		prim()
-		#kruskal()
-		#backtracer_iter()
-		#backtracer_rec()
+		var alg : String = "prim"
+		print("Using: ", alg)
+		match (alg):
+			"prim": prim()
+			"kruskal": kruskal()
+			"backtrcr_it": backtracer_iter()
+			"backtrcr_rec": backtracer_rec()
 		
 		var end = OS.get_system_time_msecs()
 		
@@ -171,12 +173,14 @@ func backtracer_rec() -> void:
 	bktrcr_rec_main(get_random_cell())
 	
 func bktrcr_rec_main(current : Cell) -> void:
-	var neighbors = Cell.get_shuffled_neighbors()
+	print(current.grid_pos)
 	
 	for n in current.available_neighbors:
 		var neighbor : Cell = get_neighbor_for_cell(current, n)
 		
 		if neighbor.type == Cell.CELL_TYPE.DISCONNECTED:
+			print("selected neighbor: ", n)
+			
 			current.connect_to_neighbor(neighbor)
 			bktrcr_rec_main(neighbor)
 
