@@ -44,7 +44,7 @@ func _input(_event: InputEvent) -> void:
 	if Input.is_action_just_pressed("generate"):
 		reset_cells()
 		var start = OS.get_system_time_msecs()
-		var alg : String = "prim"
+		var alg : String = "backtrcr_rec"
 		print("Using: ", alg)
 		match (alg):
 			"prim": prim()
