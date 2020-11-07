@@ -1,106 +1,47 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=4 format=2]
 
-[ext_resource path="res://font/RobotoMono-Bold.ttf" type="DynamicFontData" id=1]
+[ext_resource path="res://scenes/UI.tscn" type="PackedScene" id=1]
+
+[sub_resource type="GDScript" id=2]
+script/source = "extends Control
+"
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Node2D
 
 var SCRN_SIZE : Vector2 = Vector2.ZERO
+var grid : CellGrid = null
 
 func _ready() -> void:
 	randomize()
-	SCRN_SIZE = get_viewport_rect().size - Vector2(0, 50)
+	self.SCRN_SIZE = get_viewport_rect().size - Vector2(0, 50)
 	
-	var cols = int(SCRN_SIZE.x / Cell.SIZE.x) 
-	var rows = int(SCRN_SIZE.y / Cell.SIZE.y)
+	var cols = int(self.SCRN_SIZE.x / Cell.SIZE.x) 
+	var rows = int(self.SCRN_SIZE.y / Cell.SIZE.y)
 	var offset : Vector2 = (SCRN_SIZE - Cell.SIZE*Vector2(cols, rows))/2
 	
-	var grid : CellGrid = CellGrid.new(rows, cols, offset)
-	call_deferred(\"add_child\", grid)
+	self.grid = CellGrid.new(rows, cols, offset)
+	call_deferred(\"add_child\", self.grid)
 
 func _input(_event: InputEvent) -> void:
 	if Input.is_action_just_pressed(\"ui_cancel\"):
 		print(\"quitting...\\n\\n\")
 		
 		get_tree().quit()
+
+func _on_GenerateBtn_pressed() -> void:
+	pass
 "
-
-[sub_resource type="DynamicFont" id=2]
-font_data = ExtResource( 1 )
-
-[sub_resource type="Theme" id=3]
-default_font = SubResource( 2 )
 
 [node name="Main" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+script = SubResource( 2 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="GridMain" type="Node2D" parent="."]
+[node name="Grid" type="Node2D" parent="."]
 script = SubResource( 1 )
 
-[node name="UIMain" type="Control" parent="."]
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-size_flags_vertical = 3
-theme = SubResource( 3 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="ColorRect" type="ColorRect" parent="UIMain"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_vertical = 0
-rect_min_size = Vector2( 0, 50 )
-size_flags_vertical = 3
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="HBoxContainer" type="HBoxContainer" parent="UIMain/ColorRect"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_vertical = 0
-size_flags_horizontal = 3
-size_flags_vertical = 3
-custom_constants/separation = 20
-alignment = 1
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="AlgorithmChoiche" type="OptionButton" parent="UIMain/ColorRect/HBoxContainer"]
-margin_left = 97.0
-margin_top = 11.0
-margin_right = 216.0
-margin_bottom = 39.0
-size_flags_vertical = 6
-text = "Algorithm"
-
-[node name="GenerateBtn" type="Button" parent="UIMain/ColorRect/HBoxContainer"]
-margin_left = 236.0
-margin_top = 11.0
-margin_right = 328.0
-margin_bottom = 39.0
-size_flags_vertical = 6
-text = "Generate"
-
-[node name="ResetBtn" type="Button" parent="UIMain/ColorRect/HBoxContainer"]
-margin_left = 348.0
-margin_top = 11.0
-margin_right = 410.0
-margin_bottom = 39.0
-size_flags_vertical = 6
-text = "Reset"
-
-[node name="ExportBtn" type="Button" parent="UIMain/ColorRect/HBoxContainer"]
-margin_left = 430.0
-margin_top = 11.0
-margin_right = 502.0
-margin_bottom = 39.0
-size_flags_vertical = 6
-text = "Export"
+[node name="UI" parent="." instance=ExtResource( 1 )]

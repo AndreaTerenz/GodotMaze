@@ -1,38 +1,99 @@
-[gd_scene format=2]
+[gd_scene load_steps=5 format=2]
 
-[node name="ColorRect" type="ColorRect"]
+[ext_resource path="res://font/RobotoMono-Bold.ttf" type="DynamicFontData" id=1]
+
+[sub_resource type="DynamicFont" id=1]
+font_data = ExtResource( 1 )
+
+[sub_resource type="Theme" id=2]
+default_font = SubResource( 1 )
+
+[sub_resource type="GDScript" id=3]
+script/source = "extends Control
+
+onready var alg_chooser : OptionButton = $ColorRect/HBoxContainer/AlgorithmChoiche
+
+func _ready() -> void:
+	var names : Dictionary = CellGrid.ALG_NAMES
+	
+	for i in names.keys():
+		alg_chooser.add_item(names[i], i)
+		
+func get_selected_alg() -> String:
+	var id = alg_chooser.get_selected_id()
+	var idx = alg_chooser.get_item_index(id)
+	
+	return alg_chooser.get_item_text(idx)
+"
+
+[node name="UI" type="Control"]
+anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+grow_vertical = 0
 rect_min_size = Vector2( 0, 50 )
-size_flags_horizontal = 3
-size_flags_vertical = 0
-color = Color( 0.819608, 0.819608, 0.819608, 1 )
+size_flags_vertical = 3
+theme = SubResource( 2 )
+script = SubResource( 3 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
+[node name="ColorRect" type="ColorRect" parent="."]
 anchor_right = 1.0
 anchor_bottom = 1.0
+size_flags_vertical = 3
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ColorRect"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_constants/separation = 10
 alignment = 1
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="GenerateBtn" type="Button" parent="HBoxContainer"]
-margin_left = 235.0
-margin_top = 290.0
-margin_right = 312.0
-margin_bottom = 310.0
-size_flags_vertical = 4
-text = "GENERATE"
+[node name="Label" type="Label" parent="ColorRect/HBoxContainer"]
+margin_left = 92.0
+margin_top = 14.0
+margin_right = 192.0
+margin_bottom = 36.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+text = "Algorithm:"
 
-[node name="ResetBtn" type="Button" parent="HBoxContainer"]
-margin_left = 316.0
-margin_top = 290.0
-margin_right = 364.0
-margin_bottom = 310.0
-size_flags_vertical = 4
-text = "RESET"
+[node name="AlgorithmChoiche" type="OptionButton" parent="ColorRect/HBoxContainer"]
+margin_left = 202.0
+margin_top = 11.0
+margin_right = 251.0
+margin_bottom = 39.0
+size_flags_vertical = 6
+text = "--"
+
+[node name="GenerateBtn" type="Button" parent="ColorRect/HBoxContainer"]
+margin_left = 261.0
+margin_top = 11.0
+margin_right = 353.0
+margin_bottom = 39.0
+size_flags_vertical = 6
+text = "Generate"
+
+[node name="ResetBtn" type="Button" parent="ColorRect/HBoxContainer"]
+margin_left = 363.0
+margin_top = 11.0
+margin_right = 425.0
+margin_bottom = 39.0
+size_flags_vertical = 6
+text = "Reset"
+
+[node name="ExportBtn" type="Button" parent="ColorRect/HBoxContainer"]
+margin_left = 435.0
+margin_top = 11.0
+margin_right = 507.0
+margin_bottom = 39.0
+size_flags_vertical = 6
+text = "Export"

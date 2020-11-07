@@ -2,6 +2,18 @@ class_name CellGrid
 
 extends Node2D
 
+enum ALGORITHM { PRIM = 3, KRUSKAL = 2, BACK_TRCR = 1 }
+const ALG_NAMES : Dictionary = {
+	ALGORITHM.PRIM: "Prim",
+	ALGORITHM.KRUSKAL : "Kruskal",
+	ALGORITHM.BACK_TRCR: "Backtracer"
+}
+const ALG_FUNCS : Dictionary = {
+	ALG_NAMES[ALGORITHM.PRIM] : "prim",
+	ALG_NAMES[ALGORITHM.KRUSKAL] : "kruskal",
+	ALG_NAMES[ALGORITHM.BACK_TRCR] : "backtracer_rec"
+}
+
 var cells : Array = []
 var count : int = 0
 var cols : int = -1
@@ -40,24 +52,15 @@ func _ready() -> void:
 			call_deferred("add_child", cell)
 			self.cells[r][c] = cell
 
-func _input(_event: InputEvent) -> void:
-	if Input.is_action_just_pressed("generate"):
-		reset_cells()
-		var start = OS.get_system_time_msecs()
-		var alg : String = "backtrcr_rec"
-		print("Using: ", alg)
-		match (alg):
-			"prim": prim()
-			"kruskal": kruskal()
-			"backtrcr_it": backtracer_iter()
-			"backtrcr_rec": backtracer_rec()
-		
-		var end = OS.get_system_time_msecs()
-		
-		print(abs(start - end))
-		
-	elif Input.is_action_just_pressed("connect_next"):
-		pass#boh()
+func generate(alg : String):
+	reset_cells()
+	var start = OS.get_system_time_msecs()
+	
+	call(ALG_FUNCS[alg])
+	
+	var end = OS.get_system_time_msecs()
+	
+	print(abs(start - end))
 
 func get_shuffled_edge_list() -> Array:
 	var output : Array = []
