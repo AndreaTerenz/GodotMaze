@@ -2,11 +2,14 @@
 
 [ext_resource path="res://scenes/UI.tscn" type="PackedScene" id=1]
 
-[sub_resource type="GDScript" id=2]
+[sub_resource type="GDScript" id=1]
 script/source = "extends Control
+
+func _on_UI_generate(alg) -> void:
+	$Grid.on_Generate(alg)
 "
 
-[sub_resource type="GDScript" id=1]
+[sub_resource type="GDScript" id=2]
 script/source = "extends Node2D
 
 var SCRN_SIZE : Vector2 = Vector2.ZERO
@@ -29,19 +32,25 @@ func _input(_event: InputEvent) -> void:
 		
 		get_tree().quit()
 
-func _on_GenerateBtn_pressed() -> void:
-	pass
+func on_Generate(alg : String) -> void:
+	self.grid.generate(alg)
+
+func on_Reset() -> void:
+	self.grid.reset_cells()
 "
 
 [node name="Main" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-script = SubResource( 2 )
+script = SubResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="Grid" type="Node2D" parent="."]
-script = SubResource( 1 )
+script = SubResource( 2 )
 
 [node name="UI" parent="." instance=ExtResource( 1 )]
+
+[connection signal="generate" from="UI" to="Grid" method="on_Generate"]
+[connection signal="reset" from="UI" to="Grid" method="on_Reset"]
