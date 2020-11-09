@@ -1,13 +1,6 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://scenes/UI.tscn" type="PackedScene" id=1]
-
-[sub_resource type="GDScript" id=1]
-script/source = "extends Control
-
-func _on_UI_generate(alg) -> void:
-	$Grid.on_Generate(alg)
-"
 
 [sub_resource type="GDScript" id=2]
 script/source = "extends Node2D
@@ -25,12 +18,22 @@ func _ready() -> void:
 	
 	self.grid = CellGrid.new(rows, cols, offset)
 	call_deferred(\"add_child\", self.grid)
+	
+	get_tree().get_root().connect(\"size_changed\", self, \"myfunc\")
 
 func _input(_event: InputEvent) -> void:
 	if Input.is_action_just_pressed(\"ui_cancel\"):
 		print(\"quitting...\\n\\n\")
 		
 		get_tree().quit()
+		
+func myfunc():
+	var delta : Vector2 = -self.SCRN_SIZE + (get_viewport_rect().size - Vector2(0, 50))
+	
+	self.grid.translate(delta/2)
+	self.SCRN_SIZE = get_viewport_rect().size
+	
+	print(\"Resizing: \", get_viewport_rect().size)
 
 func on_Generate(alg : String) -> void:
 	self.grid.generate(alg)
@@ -42,7 +45,6 @@ func on_Reset() -> void:
 [node name="Main" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-script = SubResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
