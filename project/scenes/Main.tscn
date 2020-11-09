@@ -10,7 +10,7 @@ var grid : CellGrid = null
 
 func _ready() -> void:
 	randomize()
-	self.SCRN_SIZE = get_viewport_rect().size - Vector2(0, 50)
+	self.SCRN_SIZE = get_viewport_rect().size
 	
 	var cols = int(self.SCRN_SIZE.x / Cell.SIZE.x) 
 	var rows = int(self.SCRN_SIZE.y / Cell.SIZE.y)
@@ -28,7 +28,7 @@ func _input(_event: InputEvent) -> void:
 		get_tree().quit()
 		
 func myfunc():
-	var delta : Vector2 = -self.SCRN_SIZE + (get_viewport_rect().size - Vector2(0, 50))
+	var delta : Vector2 = get_viewport_rect().size - self.SCRN_SIZE
 	
 	self.grid.translate(delta/2)
 	self.SCRN_SIZE = get_viewport_rect().size
@@ -53,6 +53,7 @@ __meta__ = {
 script = SubResource( 2 )
 
 [node name="UI" parent="." instance=ExtResource( 1 )]
+visible = false
 
 [connection signal="generate" from="UI" to="Grid" method="on_Generate"]
 [connection signal="reset" from="UI" to="Grid" method="on_Reset"]

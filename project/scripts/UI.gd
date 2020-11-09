@@ -12,7 +12,11 @@ func _ready() -> void:
 	
 	for i in k:
 		alg_chooser.add_item(names[i], i)
-		
+
+func _input(event: InputEvent) -> void:
+	if Input.is_action_just_pressed("toggle_ui"):
+		self.visible = !self.visible
+
 func get_selected_alg() -> String:
 	var id = alg_chooser.get_selected_id()
 	var idx = alg_chooser.get_item_index(id)
