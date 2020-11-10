@@ -3,7 +3,7 @@ extends Control
 signal reset
 signal generate(alg)
 
-onready var alg_chooser : OptionButton = $ColorRect/HBoxContainer/AlgorithmChoiche
+onready var alg_chooser : OptionButton = $ColorRect/MainContainer/AlgChoicheCont/AlgorithmChoiche
 
 func _ready() -> void:
 	var names : Dictionary = CellGrid.ALG_NAMES

@@ -2,7 +2,7 @@
 
 [ext_resource path="res://scenes/UI.tscn" type="PackedScene" id=1]
 
-[sub_resource type="GDScript" id=2]
+[sub_resource type="GDScript" id=1]
 script/source = "extends Node2D
 
 var SCRN_SIZE : Vector2 = Vector2.ZERO
@@ -29,11 +29,8 @@ func _input(_event: InputEvent) -> void:
 		
 func myfunc():
 	var delta : Vector2 = get_viewport_rect().size - self.SCRN_SIZE
-	
 	self.grid.translate(delta/2)
 	self.SCRN_SIZE = get_viewport_rect().size
-	
-	print(\"Resizing: \", get_viewport_rect().size)
 
 func on_Generate(alg : String) -> void:
 	self.grid.generate(alg)
@@ -50,10 +47,9 @@ __meta__ = {
 }
 
 [node name="Grid" type="Node2D" parent="."]
-script = SubResource( 2 )
+script = SubResource( 1 )
 
 [node name="UI" parent="." instance=ExtResource( 1 )]
-visible = false
 
 [connection signal="generate" from="UI" to="Grid" method="on_Generate"]
 [connection signal="reset" from="UI" to="Grid" method="on_Reset"]

@@ -2,16 +2,16 @@ class_name CellGrid
 
 extends Node2D
 
-enum ALGORITHM { PRIM, KRUSKAL, BACK_TRCR }
+enum ALGORITHM { PRIM, KRUSKAL} #, BACK_TRCR }
 const ALG_NAMES : Dictionary = {
 	ALGORITHM.PRIM: "Prim",
 	ALGORITHM.KRUSKAL : "Kruskal",
-	ALGORITHM.BACK_TRCR: "Backtracer"
+	#ALGORITHM.BACK_TRCR: "Backtracer"
 }
 const ALG_FUNCS : Dictionary = {
 	ALG_NAMES[ALGORITHM.PRIM] : "prim",
 	ALG_NAMES[ALGORITHM.KRUSKAL] : "kruskal",
-	ALG_NAMES[ALGORITHM.BACK_TRCR] : "backtracer_rec"
+	#ALG_NAMES[ALGORITHM.BACK_TRCR] : "backtracer_iter"
 }
 
 var cells : Array = []
@@ -163,14 +163,14 @@ func backtracer_iter() -> void:
 	
 	while not(stack.empty()):
 		var current : Cell = stack.pop_front()
-		
+		print(current.id, " ", current.grid_pos)
 		for n in current.available_neighbors:
 			var neighbor : Cell = get_neighbor_for_cell(current, n)
 			
 			if neighbor.type == Cell.CELL_TYPE.DISCONNECTED:
 				current.connect_to_neighbor(neighbor)
-				stack.push_front(neighbor)
 				stack.push_front(current)
+				stack.push_front(neighbor)
 
 func backtracer_rec() -> void:
 	bktrcr_rec_main(get_random_cell())
