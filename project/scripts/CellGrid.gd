@@ -144,6 +144,24 @@ func prim() -> void:
 				next.connect_to_neighbor(neigh)
 			elif neigh.type == Cell.CELL_TYPE.DISCONNECTED:
 				frontier.append(neigh)
+				
+#func prim_static() -> Array:
+#	var r_start := randi() % self.rows
+#	var c_start := randi() % self.cols
+#	var start_cell := get_cell_at(Vector2(c_start, r_start))
+#
+#	var connections_grid := []
+#	for r in range(0, self.rows):
+#		var row := []
+#		for c in range(0, self.cols):
+#			row.append(0b0000)
+#		connections_grid.append(row)
+#
+#	var frontier := start_cell.available_neighbors.duplicate(true)
+#
+#
+#
+#	return connections_grid
 
 func kruskal() -> void:
 	var edges : Array = get_shuffled_edge_list()

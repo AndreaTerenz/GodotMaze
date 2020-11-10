@@ -14,7 +14,7 @@ var grid_pos : Vector2 = Vector2.ZERO
 var neighbors_ids : Array = [-1, -1, -1, -1]
 var available_neighbors : Array = []
 var type = CELL_TYPE.DISCONNECTED
-var connections : Array = [null, null, null, null]
+var connections : int = 0b0000 #4 bit value codifying to which neighbors the cell is connected
 var id : int = -1
 
 var kruskal_parent = self
@@ -37,8 +37,7 @@ func _init(p : Vector2, g_p : Vector2, i : int, n_i : Array, t = CELL_TYPE.DISCO
 func reset() -> void:
 	self.type = CELL_TYPE.DISCONNECTED
 	self.kruskal_parent = self
-	for n in NEIGHBORS.values():
-		self.connections[n] = null
+	self.connections = 0b0000
 	self.available_neighbors.shuffle()
 	update()
 
@@ -57,7 +56,7 @@ func get_color_for_type() -> Color:
 
 func connect_to_neighbor(neighbor, propagate : bool = true) -> void:
 	var n = pos_delta_to_neighbor(neighbor.grid_pos - self.grid_pos)
-	self.connections[n] = neighbor
+	self.connections = self.connections | (1 << n)
 	
 	self.type = CELL_TYPE.CONNECTED
 	update()
@@ -69,7 +68,7 @@ func draw_borders() -> void:
 	var c : Color = Color(0, 0, 0)
 	
 	for n in NEIGHBORS.values():
-		if (self.connections[n] == null):
+		if (self.connections & (1 << n)) == 0:
 			var start : Vector2 = Vector2.ZERO
 			var end : Vector2 = Vector2.ONE
 			
