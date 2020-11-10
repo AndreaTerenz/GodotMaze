@@ -7,15 +7,15 @@ enum NEIGHBORS {TOP = 0, LEFT = 1, BOTTOM = 2, RIGHT = 3}
 
 #don't let this number drop under 15 or the recursive backtracer will have a stack overflow
 const SIDE = 30
-const SIZE : Vector2 = Vector2(SIDE, SIDE)
+const SIZE := Vector2(SIDE, SIDE)
 
-var top_left : Vector2 = Vector2.ZERO
-var grid_pos : Vector2 = Vector2.ZERO
-var neighbors_ids : Array = [-1, -1, -1, -1]
-var available_neighbors : Array = []
+var top_left := Vector2.ZERO
+var grid_pos := Vector2.ZERO
+var neighbors_ids := [-1, -1, -1, -1]
+var available_neighbors := []
 var type = CELL_TYPE.DISCONNECTED
-var connections : int = 0b0000 #4 bit value codifying to which neighbors the cell is connected
-var id : int = -1
+var connections := 0b0000 #4 bit value codifying to which neighbors the cell is connected
+var id := -1
 
 var kruskal_parent = self
 var kruskal_root = self
@@ -54,7 +54,7 @@ func get_color_for_type() -> Color:
 		
 	return Color(0)
 
-func connect_to_neighbor(neighbor, propagate : bool = true) -> void:
+func connect_to_neighbor(neighbor, propagate : = true) -> void:
 	var n = pos_delta_to_neighbor(neighbor.grid_pos - self.grid_pos)
 	self.connections = self.connections | (1 << n)
 	
@@ -65,12 +65,12 @@ func connect_to_neighbor(neighbor, propagate : bool = true) -> void:
 		neighbor.connect_to_neighbor(self, false)
 
 func draw_borders() -> void:
-	var c : Color = Color(0, 0, 0)
+	var c := Color(0, 0, 0)
 	
 	for n in NEIGHBORS.values():
 		if (self.connections & (1 << n)) == 0:
-			var start : Vector2 = Vector2.ZERO
-			var end : Vector2 = Vector2.ONE
+			var start := Vector2.ZERO
+			var end := Vector2.ONE
 			
 			match (n):
 				NEIGHBORS.TOP    : end.y = 0
@@ -84,7 +84,7 @@ func draw_borders() -> void:
 			draw_line(start, end, c, 3.0)
 
 func _draw() -> void:
-	var r : Rect2 = Rect2(self.top_left, SIZE)
+	var r := Rect2(self.top_left, SIZE)
 
 	draw_rect(r, get_color_for_type())
 	draw_borders()
@@ -97,7 +97,7 @@ func _draw() -> void:
 	"""
 	
 func get_neighbor_pos(n) -> Vector2:
-	var pos_delta : Vector2 = get_neighbor_pos_delta(n)
+	var pos_delta := get_neighbor_pos_delta(n)
 	return self.grid_pos + pos_delta
 
 func get_random_neighbor() -> Vector2:
@@ -125,7 +125,7 @@ func kruskal_merge_with(other) -> bool:
 	return (root != other_root)
 
 static func get_shuffled_neighbors() -> Array:
-	var output : Array = NEIGHBORS.values().duplicate(true)
+	var output := NEIGHBORS.values().duplicate(true)
 	output.shuffle()
 	return output
 

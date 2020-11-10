@@ -5,16 +5,16 @@
 [sub_resource type="GDScript" id=1]
 script/source = "extends Node2D
 
-var SCRN_SIZE : Vector2 = Vector2.ZERO
+var SCRN_SIZE := Vector2.ZERO
 var grid : CellGrid = null
 
 func _ready() -> void:
 	randomize()
 	self.SCRN_SIZE = get_viewport_rect().size
 	
-	var cols = int(self.SCRN_SIZE.x / Cell.SIZE.x) 
-	var rows = int(self.SCRN_SIZE.y / Cell.SIZE.y)
-	var offset : Vector2 = (SCRN_SIZE - Cell.SIZE*Vector2(cols, rows))/2
+	var cols := int(self.SCRN_SIZE.x / Cell.SIZE.x) 
+	var rows := int(self.SCRN_SIZE.y / Cell.SIZE.y)
+	var offset := (SCRN_SIZE - Cell.SIZE*Vector2(cols, rows))/2
 	
 	self.grid = CellGrid.new(rows, cols, offset)
 	call_deferred(\"add_child\", self.grid)
@@ -28,7 +28,7 @@ func _input(_event: InputEvent) -> void:
 		get_tree().quit()
 		
 func myfunc():
-	var delta : Vector2 = get_viewport_rect().size - self.SCRN_SIZE
+	var delta := get_viewport_rect().size - self.SCRN_SIZE
 	self.grid.translate(delta/2)
 	self.SCRN_SIZE = get_viewport_rect().size
 

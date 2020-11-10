@@ -6,7 +6,7 @@ signal generate(alg)
 onready var alg_chooser : OptionButton = $ColorRect/MainContainer/AlgChoicheCont/AlgorithmChoiche
 
 func _ready() -> void:
-	var names : Dictionary = CellGrid.ALG_NAMES
+	var names := CellGrid.ALG_NAMES
 	var k = names.keys()
 	k.sort()
 	
