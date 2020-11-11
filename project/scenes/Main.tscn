@@ -5,6 +5,8 @@
 [sub_resource type="GDScript" id=1]
 script/source = "extends Node2D
 
+signal maze_done
+
 var SCRN_SIZE := Vector2.ZERO
 var grid : CellGrid = null
 
@@ -17,17 +19,21 @@ func _ready() -> void:
 	var offset := (SCRN_SIZE - Cell.SIZE*Vector2(cols, rows))/2
 	
 	self.grid = CellGrid.new(rows, cols, offset)
+	self.grid.connect(\"maze_done\", self, \"emit_maze_done\")
 	call_deferred(\"add_child\", self.grid)
 	
-	get_tree().get_root().connect(\"size_changed\", self, \"myfunc\")
+	get_tree().get_root().connect(\"size_changed\", self, \"handle_resize\")
 
 func _input(_event: InputEvent) -> void:
 	if Input.is_action_just_pressed(\"ui_cancel\"):
 		print(\"quitting...\\n\\n\")
 		
 		get_tree().quit()
-		
-func myfunc():
+
+func emit_maze_done() -> void:
+	emit_signal(\"maze_done\")
+
+func handle_resize():
 	var delta := get_viewport_rect().size - self.SCRN_SIZE
 	self.grid.translate(delta/2)
 	self.SCRN_SIZE = get_viewport_rect().size
@@ -51,5 +57,6 @@ script = SubResource( 1 )
 
 [node name="UI" parent="." instance=ExtResource( 1 )]
 
+[connection signal="maze_done" from="Grid" to="UI" method="_on_Grid_maze_done"]
 [connection signal="generate" from="UI" to="Grid" method="on_Generate"]
 [connection signal="reset" from="UI" to="Grid" method="on_Reset"]

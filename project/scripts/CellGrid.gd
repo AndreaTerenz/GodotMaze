@@ -1,5 +1,7 @@
 class_name CellGrid
 
+signal maze_done
+
 extends Node2D
 
 enum ALGORITHM { PRIM, KRUSKAL, BACK_TRCR }
@@ -73,6 +75,7 @@ func generator_starter(userdata) -> void:
 		if (trgt != ""):
 			reset_cells()
 			call(trgt)
+			emit_signal("maze_done")
 		else:
 			break
 
@@ -177,7 +180,7 @@ func backtracer_iter() -> void:
 	
 	while not(stack.empty()):
 		var current : Cell = stack.pop_front()
-		print(current.id, " ", current.grid_pos)
+
 		for n in current.available_neighbors:
 			var neighbor := get_neighbor_for_cell(current, n)
 			
